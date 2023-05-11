@@ -6,6 +6,11 @@
 	<name>Sheet Reader</name>
 	<description>Reader </description>
 
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<jdk.version>1.8</jdk.version>
+	</properties>
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
@@ -16,6 +21,13 @@
 	    <groupId>org.apache.poi</groupId>
 	    <artifactId>poi-ooxml</artifactId>
 	    <version>5.2.3</version>
+	</dependency>
+
+	<dependency>
+		<groupId>org.projectlombok</groupId>
+		<artifactId>lombok</artifactId>
+		<version>1.18.4</version>
+		<scope>provided</scope>
 	</dependency>
 
 	</dependencies>

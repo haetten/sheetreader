@@ -1,45 +1,46 @@
 package br.com.haetten.sheetreader;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.ParseException;
 
 import javax.swing.JFileChooser;
 
-import org.apache.poi.hssf.extractor.OldExcelExtractor;
 import org.apache.poi.hssf.usermodel.HSSFDataFormatter;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.poifs.filesystem.FileMagic;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.formula.eval.ErrorEval;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.HeaderFooter;
 import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class Main {
-	public static void main(String... args) throws InvalidFormatException {
+	public static void main(String... args) throws InvalidFormatException, ParseException {
 		JFileChooser fc = new JFileChooser();
 
 		if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 			try {
-				readWorkbook(fc.getSelectedFile());
+//				Workbook wb = readWorkbook(fc.getSelectedFile());
+//				printWorkbook(wb);
+				System.out.println(new TechMappingSheetReader().leFormatoEspecifico(fc.getSelectedFile()));
+				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 
 	}
+	
 
 	private static String getCellValue(Cell cell) {
         StringBuilder text = new StringBuilder();
         HSSFDataFormatter _formatter = new HSSFDataFormatter();
+        
+        if(cell == null) {
+        	return "";
+        }
         
 		switch (cell.getCellType()) {
 			case STRING:
@@ -141,55 +142,14 @@ public class Main {
 		return text.toString();
 
 	}
+	
 
-	private static void readWorkbook(File file) throws IOException, InvalidFormatException {
-		Workbook wb;
-		byte[] bytes = readFileToBytes(file);
-		FileMagic fileMagic = FileMagic.valueOf(bytes);
-		switch (fileMagic) {
-			case OOXML:
-				wb = new XSSFWorkbook(file);
-				break;
-			case OLE2:
-				wb = new HSSFWorkbook(new POIFSFileSystem(file));
-				break;
-			case BIFF4: // OldExcelExtractor
-			default:
-				throw new IllegalArgumentException("Received file does not have a standard excel extension.");
-
-		}
-		
-		wb.setMissingCellPolicy(MissingCellPolicy.RETURN_BLANK_AS_NULL);
-
-		
-		System.out.println(getCellValue(wb.getSheetAt(0).getRow(1).getCell(2)));
-		
+	private static void printWorkbook(Workbook wb) throws IOException, InvalidFormatException {		
 		for (int iSheet = 0; iSheet < wb.getNumberOfSheets(); iSheet++) {
 			readSheet(wb, iSheet);
 		}
 		
 		wb.close();
-
-	}
-
-	private static byte[] readFileToBytes(File file) throws IOException {
-		byte[] bytes = new byte[(int) file.length()];
-
-		FileInputStream fis = null;
-		try {
-
-			fis = new FileInputStream(file);
-
-			// read file into bytes[]
-			fis.read(bytes);
-
-		} finally {
-			if (fis != null) {
-				fis.close();
-			}
-		}
-
-		return bytes;
 
 	}
 }
